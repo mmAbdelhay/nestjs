@@ -12,42 +12,69 @@ import {
 import { CreateItemDto } from './dto/create-item.dto';
 import { Request, Response } from 'express';
 import { ItemsService } from './items.service';
-import { Item } from './interfaces/item.interface';
+import { responseObject } from '../responseObject';
 
 @Controller('items')
 export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
-  /* express style */
-  // @Get()
-  // findAll(@Req() req: Request, @Res() res: Response): Response {
-  //   return res.json({ message: 'hello world!' });
-  // }
 
   @Get()
-  async findAll(): Promise<Item[]> {
-    return await this.itemsService.findAll();
+  async findAll(@Res() res: Response) {
+    const items = await this.itemsService.findAll();
+    res.json(
+      responseObject('All items', items ?? 'no items found', res.statusCode),
+    );
   }
 
-  @Get(':id')
-  async findOne(@Param('id') id): Promise<Item> {
-    return await this.itemsService.findOne(id);
+  @Get(':name')
+  async findOne(@Param('name') name, @Res() res: Response) {
+    const item = await this.itemsService.findOne(name);
+    res.json(
+      responseObject(
+        'Item',
+        item ?? 'no item found by this name',
+        res.statusCode,
+      ),
+    );
   }
 
   @Post()
-  async create(@Body() createItemDto: CreateItemDto): Promise<Item> {
-    return await this.itemsService.create(createItemDto);
+  async create(@Body() createItemDto: CreateItemDto, @Res() res: Response) {
+    const newItem = await this.itemsService.create(createItemDto);
+    res.json(
+      responseObject(
+        newItem ? 'Item created successfully' : 'Item not created',
+        newItem ?? 'Item not created',
+        res.statusCode,
+      ),
+    );
   }
 
   @Delete(':id')
-  async delete(@Param('id') id): Promise<Item> {
-    return await this.itemsService.delete(id);
+  async delete(@Param('id') id, @Res() res: Response) {
+    const item = await this.itemsService.delete(id);
+    res.json(
+      responseObject(
+        item ? 'Item deleted successfully' : 'Item not deleted',
+        item ?? 'Item not deleted',
+        res.statusCode,
+      ),
+    );
   }
 
   @Put(':id')
   async update(
     @Body() updateItemDto: CreateItemDto,
     @Param('id') id,
-  ): Promise<Item> {
-    return await this.itemsService.update(id, updateItemDto);
+    @Res() res: Response,
+  ) {
+    const updatedItem = await this.itemsService.update(id, updateItemDto);
+    res.json(
+      responseObject(
+        updatedItem ? 'Item updated successfully' : 'Item not updated',
+        updatedItem ?? 'Item not updated',
+        res.statusCode,
+      ),
+    );
   }
 }
