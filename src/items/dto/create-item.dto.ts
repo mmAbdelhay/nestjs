@@ -1,5 +1,11 @@
+import { IsNotEmpty, isNumber } from 'class-validator';
+
 export class CreateItemDto {
-    readonly name: string;
-    readonly description: string;
-    readonly qty: number;
+  @IsNotEmpty()
+  readonly name: string;
+
+  @IsNotEmpty()
+  readonly description: string;
+
+  readonly qty: number;
 }
